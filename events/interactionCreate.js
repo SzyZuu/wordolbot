@@ -27,10 +27,20 @@ module.exports = {
 
             if (now < expirationTime) {
                 const expiredTimestamp = Math.round(expirationTime / 1_000);
-                return interaction.reply({
+                await interaction.reply({
                     content: `SLOW DOWN MATE \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
                     flags: MessageFlags.Ephemeral,
                 });
+
+                setTimeout(async () => {
+                    try{
+                        await interaction.deleteReply();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }, 5000)
+
+                return;
             }
         }
 
