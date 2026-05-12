@@ -11,6 +11,7 @@ module.exports = {
 		const allStatMessages = allWordleMessages.filter(msg => msg.content.includes('Your group'));
 
 		console.log('First of all: ' + allWordleMessages.first().content + ' First of stats: ' + allStatMessages.first().content);
+		console.log('Amount stat messages: ' + allStatMessages.size);
 
 		const members = await interaction.guild.members.fetch();
 
@@ -62,7 +63,7 @@ module.exports = {
 		}
 
 		for (const occurence of occurences) {
-			console.log(occurences.get(occurence.id));
+			console.log('Occurence: ' + occurences.get(occurence.id));
 		}
 	},
 };
