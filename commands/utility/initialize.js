@@ -13,11 +13,11 @@ module.exports = {
 		console.log('First of stats: ' + allStatMessages.first().content);
 		console.log('Amount stat messages: ' + allStatMessages.size);
 
-		const members = await interaction.guild.members.fetch();
-		for (const member of members) {
-			console.log('Got member: ' + member[1].displayName);
-		}
+		const totalDays = allStatMessages.size;
+		const userHistory = new Map();
+		const userStreaks = new Map();
 
+		const members = await interaction.guild.members.fetch();
 		const memberIndex = members.map(m => ({
 			id: m.id,
 			names: [
@@ -29,9 +29,10 @@ module.exports = {
 
 		const occurences = new Map();
 
-		for (const msg of allStatMessages) {
+		let i = 0;
+		allStatMessages.forEach((msg) => {
 			const matches = [];
-			const msgContent = normalize(msg[1].content);
+			const msgContent = normalize(msg.content);
 
 			for (const member of memberIndex) {
 				for (const name of member.names) {
@@ -61,11 +62,30 @@ module.exports = {
 
 			for (const f of final) {
 				occurences.set(f.id, (occurences.get(f.id) || 0) + 1);
+				if (!userHistory.has(f.id)) {
+					userHistory.set(f.id, new Array(totalDays).fill(0));
+				}
+				userHistory.get(f.id)[i] = 1;
 			}
-		}
+
+			i++;
+		});
 
 		for (const [id, count] of occurences) {
-			console.log('Occurence (id, count): ' + id + ' ' + count);
+			let currentStreak = 0;
+			let maxStreak = 0;
+
+			const dayArray = userHistory.get(id);
+			for (const day in dayArray) {
+				if (day === 1) {
+					currentStreak++;
+					if (currentStreak > maxStreak) maxStreak = currentStreak;
+				}
+				else {currentStreak = 0;}
+			}
+
+			userStreaks.set(id, maxStreak);
+			console.log('Occurence (id, count): ' + id + ' ' + count + ' streak: ' + maxStreak);
 		}
 	},
 };
