@@ -10,16 +10,20 @@ module.exports = {
 		const allWordleMessages = messages.filter(msg => msg.author.id === process.env.WORDLE_USER_ID);
 		const allStatMessages = allWordleMessages.filter(msg => msg.content.includes('Your group'));
 
-		console.log('First of all: ' + allWordleMessages.first().content + ' First of stats: ' + allStatMessages.first().content);
+		console.log('First of stats: ' + allStatMessages.first().content);
 		console.log('Amount stat messages: ' + allStatMessages.size);
 
 		const members = await interaction.guild.members.fetch();
+		for (const member of members) {
+			console.log('Got member: ' + member[1].displayName);
+		}
 
 		const memberIndex = members.map(m => ({
 			id: m.id,
 			names: [
 				normalize(m.displayName),
 				normalize(m.user.username),
+				m.id,
 			],
 		}));
 
@@ -27,13 +31,11 @@ module.exports = {
 
 		for (const msg of allStatMessages) {
 			const matches = [];
-			msgContent = normalize(msg.content);
+			const msgContent = normalize(msg[1].content);
 
 			for (const member of memberIndex) {
 				for (const name of member.names) {
 					if (!name) continue;
-
-					if (!msgContent.includes(' ' + name + ' ')) continue;
 
 					if (msgContent.includes(name)) {
 						matches.push({
@@ -62,8 +64,8 @@ module.exports = {
 			}
 		}
 
-		for (const occurence of occurences) {
-			console.log('Occurence: ' + occurences.get(occurence.id));
+		for (const [id, count] of occurences) {
+			console.log('Occurence (id, count): ' + id + ' ' + count);
 		}
 	},
 };
