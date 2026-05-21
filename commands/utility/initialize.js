@@ -76,7 +76,7 @@ module.exports = {
 			let maxStreak = 0;
 
 			const dayArray = userHistory.get(id);
-			for (const day in dayArray) {
+			for (const day of dayArray) {
 				if (day === 1) {
 					currentStreak++;
 					if (currentStreak > maxStreak) maxStreak = currentStreak;
