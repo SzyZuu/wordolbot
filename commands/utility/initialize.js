@@ -13,6 +13,9 @@ module.exports = {
 		console.log('First of stats: ' + allStatMessages.first().content);
 		console.log('Amount stat messages: ' + allStatMessages.size);
 
+		const ocr = require('../../helpers/tesseractOcr.js');
+		await ocr.extractWordleNumber(allStatMessages.first().attachments.first().url);
+
 		const totalDays = allStatMessages.size;
 		const userHistory = new Map();
 		const userStreaks = new Map();
