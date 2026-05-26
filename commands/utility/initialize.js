@@ -107,7 +107,7 @@ module.exports = {
 			}
 
 			userStreaks.set(id, maxStreak);
-			console.log('Occurence (id, count): ' + id + ' ' + count + ' streak: ' + maxStreak);
+			console.log('Occurence (id, count): ' + id + ' ' + count + ' streak: ' + maxStreak + ' avg: ' + avgs.get(id));
 		}
 
 		// prepare stuffs for sending to db
