@@ -22,14 +22,16 @@ module.exports = {
 
 		const members = await interaction.guild.members.fetch();
 		const memberIndex = new Map(
-			members.map(m => ({
-				id: m.id,
-				names: [
-					normalize(m.displayName),
-					normalize(m.user.username),
-					m.id,
-				],
-			})));
+			members.map(m => [
+				m.id,
+				{
+					names: [
+						normalize(m.displayName),
+						normalize(m.user.username),
+						m.id,
+					],
+				},
+			]));
 
 		const occurences = new Map();
 		const avgs = new Map();
@@ -47,13 +49,13 @@ module.exports = {
 					const guesses = score === 'X' ? 7 : parseInt(score, 10);
 
 					const msgContent = normalize(line);
-					for (const member of memberIndex.values()) {
+					for (const [usrID, member] of memberIndex) {
 						for (const name of member.names) {
 							if (!name) continue;
 
 							if (msgContent.includes(name)) {
 								matches.push({
-									id: member.id,
+									id: usrID,
 									name,
 									score: name.length,
 									usrGuesses: guesses,
