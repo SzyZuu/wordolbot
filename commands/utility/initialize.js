@@ -42,7 +42,7 @@ module.exports = {
 			const lines = msg.content.split('\n');
 
 			for (const line of lines) {
-				const match = line.trim().match(/^([1-6xX])\/6:\s*(.+)$/);
+				const match = line.match(/([1-6xX])\/6/i);
 
 				if (match) {
 					const score = match[1].toUpperCase();
@@ -82,7 +82,7 @@ module.exports = {
 				const playerOccurences = (occurences.get(f.id) || 0);
 				const prevAvg = (avgs.get(f.id) || 0);
 
-				avgs.set(f.id, ((prevAvg * playerOccurences) + f.usrGuesses) / playerOccurences + 1);
+				avgs.set(f.id, ((prevAvg * playerOccurences) + f.usrGuesses) / (playerOccurences + 1));
 				occurences.set(f.id, playerOccurences + 1);
 				if (!userHistory.has(f.id)) {
 					userHistory.set(f.id, new Array(totalDays).fill(0));
