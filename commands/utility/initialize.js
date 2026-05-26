@@ -14,7 +14,7 @@ module.exports = {
 		console.log('Amount stat messages: ' + allStatMessages.size);
 
 		const ocr = require('../../helpers/tesseractOcr.js');
-		await ocr.extractWordleNumber(allStatMessages.first().attachments.first().url);
+		const wordleNumber = await ocr.extractWordleNumber(allStatMessages.first().attachments.first().url);
 
 		const totalDays = allStatMessages.size;
 		const userHistory = new Map();
@@ -90,6 +90,13 @@ module.exports = {
 			userStreaks.set(id, maxStreak);
 			console.log('Occurence (id, count): ' + id + ' ' + count + ' streak: ' + maxStreak);
 		}
+
+		const ids = occurences.keys().toArray();
+		const names = ids.map(id => {
+			const member = memberIndex.find(m => m.id === id);
+			return member.names[0];
+		});
+		const streaks = ids.map(id => userStreaks.get(id));
 	},
 };
 
