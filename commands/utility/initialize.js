@@ -75,12 +75,15 @@ module.exports = {
 				if (!used.has(m.id)) {
 					final.push(m);
 					used.add(m.id);
-					avgs.set(m.id, ((avgs.get(m.id) || 0) * i + m.usrGuesses) / (i + 1));
 				}
 			}
 
 			for (const f of final) {
-				occurences.set(f.id, (occurences.get(f.id) || 0) + 1);
+				const playerOccurences = (occurences.get(f.id) || 0);
+				const prevAvg = (avgs.get(f.id) || 0);
+
+				avgs.set(f.id, ((prevAvg * playerOccurences) + f.usrGuesses) / playerOccurences + 1);
+				occurences.set(f.id, playerOccurences + 1);
 				if (!userHistory.has(f.id)) {
 					userHistory.set(f.id, new Array(totalDays).fill(0));
 				}
@@ -109,7 +112,7 @@ module.exports = {
 
 		// prepare stuffs for sending to db
 		const ids = occurences.keys().toArray();
-		const names = ids.map(id => memberIndex.get(id)[0]);
+		const names = ids.map(id => memberIndex.get(id).names[0]);
 		const streaks = ids.map(id => userStreaks.get(id));
 		const averages = ids.map(id => {
 			const raw = (avgs.get(id) || 0);
