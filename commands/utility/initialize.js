@@ -21,32 +21,45 @@ module.exports = {
 		const userStreaks = new Map();
 
 		const members = await interaction.guild.members.fetch();
-		const memberIndex = members.map(m => ({
-			id: m.id,
-			names: [
-				normalize(m.displayName),
-				normalize(m.user.username),
-				m.id,
-			],
-		}));
+		const memberIndex = new Map(
+			members.map(m => ({
+				id: m.id,
+				names: [
+					normalize(m.displayName),
+					normalize(m.user.username),
+					m.id,
+				],
+			})));
 
 		const occurences = new Map();
+		const avgs = new Map();
 
 		let i = 0;
 		allStatMessages.forEach((msg) => {
 			const matches = [];
-			const msgContent = normalize(msg.content);
+			const lines = msg.content.split('\n');
 
-			for (const member of memberIndex) {
-				for (const name of member.names) {
-					if (!name) continue;
+			for (const line of lines) {
+				const match = line.trim().match(/^([1-6xX])\/6:\s*(.+)$/);
 
-					if (msgContent.includes(name)) {
-						matches.push({
-							id: member.id,
-							name,
-							score: name.length,
-						});
+				if (match) {
+					const score = match[1].toUpperCase();
+					const guesses = score === 'X' ? 7 : parseInt(score, 10);
+
+					const msgContent = normalize(line);
+					for (const member of memberIndex.values()) {
+						for (const name of member.names) {
+							if (!name) continue;
+
+							if (msgContent.includes(name)) {
+								matches.push({
+									id: member.id,
+									name,
+									score: name.length,
+									usrGuesses: guesses,
+								});
+							}
+						}
 					}
 				}
 			}
@@ -60,6 +73,7 @@ module.exports = {
 				if (!used.has(m.id)) {
 					final.push(m);
 					used.add(m.id);
+					avgs.set(m.id, ((avgs.get(m.id) || 0) * i + m.usrGuesses) / (i + 1));
 				}
 			}
 
@@ -91,12 +105,14 @@ module.exports = {
 			console.log('Occurence (id, count): ' + id + ' ' + count + ' streak: ' + maxStreak);
 		}
 
+		// prepare stuffs for sending to db
 		const ids = occurences.keys().toArray();
-		const names = ids.map(id => {
-			const member = memberIndex.find(m => m.id === id);
-			return member.names[0];
-		});
+		const names = ids.map(id => memberIndex.get(id)[0]);
 		const streaks = ids.map(id => userStreaks.get(id));
+		const averages = ids.map(id => {
+			const raw = (avgs.get(id) || 0);
+			return Math.round(raw * 10) / 10;
+		});
 	},
 };
 
