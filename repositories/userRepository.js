@@ -31,6 +31,14 @@ async function initializeUsers(userIds, names, streaks, guesses, gameNr, serverI
 	await db.query(userServerQuery, [userIds, serverID]);
 }
 
+async function updateTimeBuffer(userId, daytime) {
+	const query = `
+	UPDATE users SET time_buffer = $2 WHERE user_id = $3 
+	`;
+
+	await db.query(query, [userId, daytime]);
+}
+
 async function getLazyUsers() {
 
 }
