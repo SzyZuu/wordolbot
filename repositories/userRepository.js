@@ -1,6 +1,6 @@
 const db = require('../db');
 
-async function updateUser(userIds, names, streaks, guesses, gameNr) {
+async function updateUsers(userIds, names, streaks, guesses, gameNr, serverID) {
 	const query = `
 	INSERT INTO users (user_id, name, streak, avg_guesses, games_played, last_played)
 	SELECT 
@@ -18,6 +18,17 @@ async function updateUser(userIds, names, streaks, guesses, gameNr) {
 		last_played		 = $5;
 	`;
 	await db.query(query, [userIds, names, streaks, guesses, gameNr]);
+
+	const userServerQuery = `
+	INSERT INTO user_servers (user_id, server_id) 
+	SELECT
+	    id,
+	    $2
+	FROM UNNEST($1::bigint[]) AS t(id)
+	ON CONFLICT (user_id, server_id) DO NOTHING
+	`;
+
+	await db.query(userServerQuery, [userIds, serverID]);
 }
 
 async function getLazyUsers() {
