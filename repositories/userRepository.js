@@ -1,6 +1,6 @@
 const db = require('../db');
 
-async function updateUsers(userIds, names, streaks, guesses, gameNr, serverID) {
+async function initializeUsers(userIds, names, streaks, guesses, gameNr, serverID) {
 	const query = `
 	INSERT INTO users (user_id, name, streak, avg_guesses, games_played, last_played)
 	SELECT 
