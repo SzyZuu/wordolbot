@@ -11,11 +11,7 @@ async function initializeUsers(userIds, names, streaks, guesses, gameNr, serverI
 		1,
 		$5
 	FROM UNNEST($1::bigint[], $2::text[], $3::numeric[], $4::numeric[]) AS t(id, user_name, p_streak, guess)
-	ON CONFLICT (user_id) DO UPDATE SET
-		streak           = users.streak + 1,
-		avg_guesses      = ROUND((COALESCE(users.avg_guesses, 0) * users.games_played + EXCLUDED.avg_guesses) / (users.games_played + 1), 1),
-		games_played     = users.games_played + 1,
-		last_played		 = $5;
+	ON CONFLICT (user_id) DO NOTHING
 	`;
 	await db.query(query, [userIds, names, streaks, guesses, gameNr]);
 
@@ -37,8 +33,4 @@ async function updateTimeBuffer(userId, daytime) {
 	`;
 
 	await db.query(query, [userId, daytime]);
-}
-
-async function getLazyUsers() {
-
 }
