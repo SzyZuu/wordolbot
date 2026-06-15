@@ -1,7 +1,8 @@
 const { Events } = require('discord.js');
 const { normalize } = require('../helpers/normalize.js');
-const { findUsersGuesses } = require('../helpers/findUsers.js');
+const { findUsersGuesses, findUsers } = require('../helpers/findUsers.js');
 const historyRepository = require('../repositories/historyRepository');
+const userRepository = require('../repositories/userRepository');
 const gameRepository = require('../repositories/gameRepository');
 
 module.exports = {
@@ -27,7 +28,16 @@ module.exports = {
 		const isSummary = message.content.includes('Your group is on');
 
 		if (!isSummary) {
-			// todo ig (get users, timestamp and update time buffer)
+			const now = new Date();
+			const minutes = now.getUTCMinutes();
+			const hours = now.getUTCHours();
+			const utcTime = `${hours}:${minutes}:00`;
+
+			const foundUsers = findUsers(memberIndex, message.content);
+
+			for (const user of foundUsers) {
+				await userRepository.updateTimeBuffer(user.id, utcTime);
+			}
 		}
 		else {
 			const ocr = require('../helpers/tesseractOcr');

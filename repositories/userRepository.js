@@ -34,3 +34,5 @@ async function updateTimeBuffer(userId, daytime) {
 
 	await db.query(query, [userId, daytime]);
 }
+
+module.exports = { initializeUsers, updateTimeBuffer };
