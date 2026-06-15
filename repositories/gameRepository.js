@@ -9,3 +9,5 @@ async function addGame(gameNr) {
 
 	await db.query(query, [gameNr]);
 }
+
+module.exports = { addGame };

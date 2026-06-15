@@ -2,6 +2,7 @@ const { Events } = require('discord.js');
 const { normalize } = require('../helpers/normalize.js');
 const { findUsers } = require('../helpers/findUsers.js');
 const historyRepository = require('../repositories/historyRepository');
+const gameRepository = require('../repositories/gameRepository');
 
 module.exports = {
 	name: Events.MessageCreate,
@@ -34,6 +35,16 @@ module.exports = {
 
 			const lines = message.content.split('\n');
 			const final = findUsers(memberIndex, lines);
+			const ids = [];
+			const guesses = [];
+
+			for (const f of final) {
+				ids.push(f.id);
+				guesses.push(f.usrGuesses);
+			}
+
+			await gameRepository.addGame(wordleNumber);
+			await historyRepository.addGameHistory(ids, wordleNumber, guesses);
 		}
 	},
 };
