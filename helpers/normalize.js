@@ -7,4 +7,4 @@ function normalize(str) {
 		.trim();
 }
 
-module.exports = normalize;
+module.exports = { normalize };

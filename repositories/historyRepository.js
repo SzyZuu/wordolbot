@@ -25,4 +25,4 @@ async function addGameHistory(userId, wordleNumber, guesses) {
 	await db.query(query, [userId, wordleNumber, guesses]);
 }
 
-module.exports = { addGameHistory };
+module.exports = { addGameHistory, addSingleGameHistory };

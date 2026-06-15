@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { normalize } = require('../../helpers/normalize.js');
+const { findUsers } = require('../../helpers/findUsers.js');
 
 module.exports = {
 	cooldown: 60,
@@ -39,45 +40,9 @@ module.exports = {
 
 		let i = 0;
 		allStatMessages.forEach((msg) => {
-			const matches = [];
 			const lines = msg.content.split('\n');
 
-			for (const line of lines) {
-				const match = line.match(/([1-6xX])\/6/i);
-
-				if (match) {
-					const score = match[1].toUpperCase();
-					const guesses = score === 'X' ? 7 : parseInt(score, 10);
-
-					const msgContent = normalize(line);
-					for (const [usrID, member] of memberIndex) {
-						for (const name of member.names) {
-							if (!name) continue;
-
-							if (msgContent.includes(name)) {
-								matches.push({
-									id: usrID,
-									name,
-									score: name.length,
-									usrGuesses: guesses,
-								});
-							}
-						}
-					}
-				}
-			}
-
-			matches.sort((a, b) => b.score - a.score);
-
-			const final = [];
-			const used = new Set();
-
-			for (const m of matches) {
-				if (!used.has(m.id)) {
-					final.push(m);
-					used.add(m.id);
-				}
-			}
+			const final = findUsers(memberIndex, lines);
 
 			for (const f of final) {
 				const playerOccurences = (occurences.get(f.id) || 0);
