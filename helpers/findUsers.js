@@ -1,6 +1,6 @@
 const { normalize } = require('./normalize.js');
 
-function findUsers(memberIndex, lines) {
+function findUsersGuesses(memberIndex, lines) {
 	const matches = [];
 	for (const line of lines) {
 		const match = line.match(/([1-6xX])\/6/i);
@@ -18,7 +18,7 @@ function findUsers(memberIndex, lines) {
 						matches.push({
 							id: usrID,
 							name,
-							score: name.length,
+							matchLength: name.length,
 							usrGuesses: guesses,
 						});
 					}
@@ -27,7 +27,31 @@ function findUsers(memberIndex, lines) {
 		}
 	}
 
-	matches.sort((a, b) => b.score - a.score);
+	return filterMatches(matches);
+}
+
+function findUsers(memberIndex, message) {
+	const matches = [];
+	const msgContent = normalize(message);
+
+	for (const [usrID, member] of memberIndex) {
+		for (const name of member.names) {
+			if (!name) continue;
+
+			if (msgContent.includes(name)) {
+				matches.push({
+					id: usrID,
+					matchLength: name.length,
+				});
+			}
+		}
+	}
+
+	return filterMatches(matches);
+}
+
+function filterMatches(matches) {
+	matches.sort((a, b) => b.matchLength - a.matchLength);
 
 	const final = [];
 	const used = new Set();
@@ -41,5 +65,4 @@ function findUsers(memberIndex, lines) {
 
 	return final;
 }
-
-module.exports = { findUsers };
+module.exports = { findUsersGuesses, findUsers };
