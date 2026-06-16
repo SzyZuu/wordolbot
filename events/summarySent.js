@@ -7,12 +7,11 @@ const gameRepository = require('../repositories/gameRepository');
 
 module.exports = {
 	name: Events.MessageCreate,
-	execute: async (message) => {
-		if (!message.author.id === process.env.WORDLE_USER_ID) return;
+	async execute(message) {
+		console.log('Message created');
+		if (message.author.id !== process.env.WORDLE_USER_ID) return;
 
-		const guildId = message.guild_id;
-		const guild = await message.client.guilds.fetch(guildId);
-		const members = await guild.members.fetch();
+		const members = await message.guild.members.fetch();
 		const memberIndex = new Map(
 			members.map(m => [
 				m.id,
@@ -29,15 +28,16 @@ module.exports = {
 
 		if (!isSummary) {
 			const now = new Date();
-			const minutes = now.getUTCMinutes();
-			const hours = now.getUTCHours();
+			const minutes = now.getUTCMinutes().toString().padStart(2, '0');
+			const hours = now.getUTCHours().toString().padStart(2, '0');
 			const utcTime = `${hours}:${minutes}:00`;
 
 			const foundUsers = findUsers(memberIndex, message.content);
 
-			for (const user of foundUsers) {
-				await userRepository.updateTimeBuffer(user.id, utcTime);
-			}
+			const updatePromises = foundUsers.map(user =>
+				userRepository.updateTimeBuffer(user.id, utcTime),
+			);
+			await Promise.all(updatePromises);
 		}
 		else {
 			const ocr = require('../helpers/tesseractOcr');
