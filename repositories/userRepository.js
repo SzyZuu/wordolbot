@@ -27,12 +27,34 @@ async function initializeUsers(userIds, names, streaks, guesses, gameNr, serverI
 	await db.query(userServerQuery, [userIds, serverID]);
 }
 
-async function updateTimeBuffer(userId, daytime) {
-	const query = `
-	UPDATE users SET time_buffer = $2 WHERE user_id = $3 
-	`;
+async function updateTimeBuffer(userId, daytime, serverId) {
+	const client = await db.getClient();
+	try {
+		await client.query('BEGIN');
 
-	await db.query(query, [userId, daytime]);
+		const query = `
+		INSERT INTO users (user_id, time_buffer) VALUES ($1, $2)
+		ON CONFLICT (user_id) DO UPDATE SET time_buffer = $2
+		`;
+
+		await client.query(query, [userId, daytime]);
+
+		const userServerQuery = `
+		INSERT INTO user_servers (user_id, server_id) VALUES ($1, $2)
+		ON CONFLICT (user_id, server_id) DO NOTHING
+		`;
+
+		await client.query(userServerQuery, [userId, serverId]);
+
+		await client.query('COMMIT');
+	}
+	catch (e) {
+		await client.query('ROLLBACK');
+		console.error(e);
+	}
+	finally {
+		client.release();
+	}
 }
 
 module.exports = { initializeUsers, updateTimeBuffer };
