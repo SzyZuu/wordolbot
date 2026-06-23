@@ -38,10 +38,26 @@ async function updateTimeBuffer(userId, daytime, serverId) {
 		ON CONFLICT (user_id, server_id) DO NOTHING
 		`;
 
-	const updateUser = db.query(query, [userId, daytime]);
+	const updateBuffer = db.query(query, [userId, daytime]);
 	const updateUserServer = db.query(userServerQuery, [userId, serverId]);
 
-	await Promise.all([updateUser, updateUserServer]);
+	await Promise.all([updateBuffer, updateUserServer]);
 }
 
-module.exports = { initializeUsers, updateTimeBuffer };
+async function updateUser(userId, currentWordle) {
+	const query = `
+	UPDATE users
+	SET
+	    streak = CASE 
+	        WHEN last_played = $2 - 1 THEN streak + 1
+	        WHEN last_played = $2 THEN streak
+			ELSE 1
+	END,
+	last_played = $2
+	WHERE user_id = $1
+	`;
+
+	await db.query(query, [userId, currentWordle]);
+}
+
+module.exports = { initializeUsers, updateTimeBuffer, updateUser };

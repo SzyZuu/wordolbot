@@ -55,6 +55,9 @@ module.exports = {
 
 			await gameRepository.addGame(wordleNumber);
 			await historyRepository.addGameHistory(ids, wordleNumber, guesses);
+
+			const promises = ids.map(id => userRepository.updateUser(id, wordleNumber));
+			await Promise.all(promises);
 		}
 	},
 };
