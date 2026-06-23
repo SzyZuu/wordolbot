@@ -52,8 +52,10 @@ async function updateUser(userId, currentWordle) {
 	        WHEN last_played = $2 - 1 THEN streak + 1
 	        WHEN last_played = $2 THEN streak
 			ELSE 1
-	END,
-	last_played = $2
+		END,
+		last_played = $2,
+		avg_guesses = ROUND((COALESCE(avg_guesses, 0) * games_played + (SELECT guesses FROM history WHERE wordle_number = $2 AND user_id = $1)) / games_played + 1),
+		games_played = games_played + 1
 	WHERE user_id = $1
 	`;
 
