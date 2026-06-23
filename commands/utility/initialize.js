@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { normalize } = require('../../helpers/normalize.js');
 const { findUsers } = require('../../helpers/findUsers.js');
+const userRepository = require('../../repositories/userRepository.js');
 
 module.exports = {
 	cooldown: 60,
@@ -84,5 +85,7 @@ module.exports = {
 			const raw = (avgs.get(id) || 0);
 			return Math.round(raw * 10) / 10;
 		});
+
+		await userRepository.initializeUsers(ids, names, streaks, averages, wordleNumber, interaction.guildId);
 	},
 };
