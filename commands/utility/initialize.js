@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const { normalize } = require('../../helpers/normalize.js');
 const { findUsers } = require('../../helpers/findUsers.js');
 const userRepository = require('../../repositories/userRepository.js');
+const { findUsersGuesses } = require('../../helpers/findUsers');
 
 module.exports = {
 	cooldown: 60,
@@ -43,7 +44,7 @@ module.exports = {
 		allStatMessages.forEach((msg) => {
 			const lines = msg.content.split('\n');
 
-			const final = findUsers(memberIndex, lines);
+			const final = findUsersGuesses(memberIndex, lines);
 
 			for (const f of final) {
 				const playerOccurences = (occurences.get(f.id) || 0);
