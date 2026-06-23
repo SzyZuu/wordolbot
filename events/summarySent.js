@@ -35,7 +35,7 @@ module.exports = {
 			const foundUsers = findUsers(memberIndex, message.content);
 
 			const updatePromises = foundUsers.map(user =>
-				userRepository.updateTimeBuffer(user.id, utcTime),
+				userRepository.updateTimeBuffer(user.id, utcTime, message.guildId),
 			);
 			await Promise.all(updatePromises);
 		}
