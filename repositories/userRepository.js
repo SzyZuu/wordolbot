@@ -15,6 +15,13 @@ async function initializeUsers(userIds, names, streaks, guesses, gameNr, serverI
 	`;
 	await db.query(query, [userIds, names, streaks, guesses, gameNr]);
 
+	const serverQuery = `
+	INSERT INTO servers (server_id, initialized) VALUES($1, TRUE)
+	ON CONFLICT (server_id) DO UPDATE SET initialized = TRUE
+	`;
+
+	await db.query(serverQuery, [serverID]);
+
 	const userServerQuery = `
 	INSERT INTO user_servers (user_id, server_id) 
 	SELECT
