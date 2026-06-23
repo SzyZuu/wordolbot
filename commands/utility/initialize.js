@@ -23,6 +23,7 @@ module.exports = {
 		const totalDays = allStatMessages.size;
 		const userHistory = new Map();
 		const userStreaks = new Map();
+		const userTotalDays = new Map();
 
 		const members = await interaction.guild.members.fetch();
 		const memberIndex = new Map(
@@ -64,17 +65,20 @@ module.exports = {
 		for (const [id, count] of occurences) {
 			let currentStreak = 0;
 			let maxStreak = 0;
+			let totalDaysCounter = 0;
 
 			const dayArray = userHistory.get(id);
 			for (const day of dayArray) {
 				if (day === 1) {
 					currentStreak++;
+					totalDaysCounter++;
 					if (currentStreak > maxStreak) maxStreak = currentStreak;
 				}
 				else {currentStreak = 0;}
 			}
 
 			userStreaks.set(id, maxStreak);
+			userTotalDays.set(id, totalDaysCounter);
 			console.log('Occurence (id, count): ' + id + ' ' + count + ' streak: ' + maxStreak + ' avg: ' + avgs.get(id));
 		}
 
@@ -86,7 +90,8 @@ module.exports = {
 			const raw = (avgs.get(id) || 0);
 			return Math.round(raw * 10) / 10;
 		});
+		const totalUserDays = ids.map(id => userTotalDays.get(id));
 
-		await userRepository.initializeUsers(ids, names, streaks, averages, wordleNumber, interaction.guildId);
+		await userRepository.initializeUsers(ids, names, streaks, averages, totalUserDays, wordleNumber, interaction.guildId);
 	},
 };
