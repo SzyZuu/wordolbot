@@ -19,9 +19,9 @@ module.exports = {
 				},
 			]));
 
-		const oldMessageUsers = findUsers(memberIndex, oldMessage);
+		const oldMessageUsers = findUsers(memberIndex, oldMessage.content);
 		const oldIds = new Set(oldMessageUsers.map((u) => u.id));
-		const newMessageUsers = findUsers(memberIndex, newMessage);
+		const newMessageUsers = findUsers(memberIndex, newMessage.content);
 
 		const now = new Date();
 		const minutes = now.getUTCMinutes().toString().padStart(2, '0');
