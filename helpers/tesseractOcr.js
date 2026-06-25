@@ -1,7 +1,7 @@
 const fs = require('fs');
 const sharp = require('sharp');
-const { createOCREngine } = require('tesseract-wasm');
-const { loadWasmBinary } = require('tesseract-wasm/node');
+const { createOCREngine } = require('fix-esm').require('tesseract-wasm');
+const { loadWasmBinary } = require('fix-esm').require('tesseract-wasm/node');
 const modelData = fs.readFileSync('eng.traineddata');
 
 module.exports = {
