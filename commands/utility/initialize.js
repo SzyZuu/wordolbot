@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { normalize } = require('../../helpers/normalize.js');
-const { findUsers } = require('../../helpers/findUsers.js');
 const userRepository = require('../../repositories/userRepository.js');
 const { findUsersGuesses } = require('../../helpers/findUsers');
 
