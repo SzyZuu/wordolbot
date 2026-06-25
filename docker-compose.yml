@@ -1,0 +1,7 @@
+services:
+        wordol-bot:
+                buid: .
+                container_name: wordol-bot
+                restart: no
+                env_file:
+                        - .env
