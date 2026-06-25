@@ -6,6 +6,7 @@ const userRepository = require('../repositories/userRepository');
 module.exports = {
 	name: Events.MessageUpdate,
 	async execute(oldMessage, newMessage) {
+		console.log('Message updated!');
 		const members = await newMessage.guild.members.fetch();
 		const memberIndex = new Map(
 			members.map(m => [
