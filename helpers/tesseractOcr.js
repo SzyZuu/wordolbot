@@ -1,11 +1,11 @@
 const fs = require('fs');
 const sharp = require('sharp');
-const { createOCREngine } = require('fix-esm').require('tesseract-wasm');
-const { loadWasmBinary } = require('fix-esm').require('tesseract-wasm/node');
 const modelData = fs.readFileSync('eng.traineddata');
 
 module.exports = {
 	extractWordleNumber : async (attachmentUrl) => {
+		const { createOCREngine } = await import('tesseract-wasm');
+		const { loadWasmBinary } = await import('tesseract-wasm/node');
 		const wasmBinary = await loadWasmBinary();
 		const response = await fetch(attachmentUrl);
 		const arrayBuffer = await response.arrayBuffer();
