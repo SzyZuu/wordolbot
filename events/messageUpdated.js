@@ -7,6 +7,11 @@ module.exports = {
 	name: Events.MessageUpdate,
 	async execute(oldMessage, newMessage) {
 		console.log('Message updated!');
+		if (newMessage.content.includes(' were playing')) return;
+		const words = new Set(oldMessage.content.split(' '));
+		const words2 = newMessage.content.split(' ');
+		if (!words2.some(word => !words.has(word))) return;
+
 		const members = await newMessage.guild.members.fetch();
 		const memberIndex = new Map(
 			members.map(m => [
