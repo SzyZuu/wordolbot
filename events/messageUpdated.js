@@ -8,6 +8,7 @@ module.exports = {
 	async execute(oldMessage, newMessage) {
 		console.log('Message updated!');
 		if (newMessage.content.includes(' were playing')) return;
+		if (newMessage.content.includes(' was playing')) return;
 		const words = new Set(oldMessage.content.split(' '));
 		const words2 = newMessage.content.split(' ');
 		if (!words2.some(word => !words.has(word))) return;
