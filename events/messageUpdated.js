@@ -1,6 +1,7 @@
 const { Events } = require('discord.js');
 const { normalize } = require('../helpers/normalize');
 const { findUsers } = require('../helpers/findUsers');
+const { setCache, getCache } = require('../db');
 const userRepository = require('../repositories/userRepository');
 
 module.exports = {
@@ -13,14 +14,32 @@ module.exports = {
 		const words2 = newMessage.content.split(' ');
 		if (!words2.some(word => !words.has(word))) return;
 
-		const members = await newMessage.guild.members.fetch();
+		let members;
+		try {
+			const fetchedMembers = await message.guild.members.fetch();
+
+			members = [...fetchedMembers.values()].map((member) => ({
+				id: member.id,
+				displayName: member.displayName,
+				username: member.user.username,
+			}));
+			await setCache(message.guildId, members);
+		}
+		catch (err) {
+			members = await getCache(message.guildId);
+			if (!members) {
+				console.log('Couldnt get any membrs', err);
+				return;
+			}
+		}
+
 		const memberIndex = new Map(
 			members.map(m => [
 				m.id,
 				{
 					names: [
 						normalize(m.displayName),
-						normalize(m.user.username),
+						normalize(m.username),
 						m.id,
 					],
 				},

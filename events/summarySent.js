@@ -1,6 +1,7 @@
 const { Events } = require('discord.js');
 const { normalize } = require('../helpers/normalize.js');
 const { findUsersGuesses, findUsers } = require('../helpers/findUsers.js');
+const { setCache, getCache } = require('../db');
 const historyRepository = require('../repositories/historyRepository');
 const userRepository = require('../repositories/userRepository');
 const gameRepository = require('../repositories/gameRepository');
@@ -11,14 +12,32 @@ module.exports = {
 		console.log('Message created');
 		if (message.author.id !== process.env.WORDLE_USER_ID) return;
 
-		const members = await message.guild.members.fetch();
+		let members;
+		try {
+			const fetchedMembers = await message.guild.members.fetch();
+
+			members = [...fetchedMembers.values()].map((member) => ({
+				id: member.id,
+				displayName: member.displayName,
+				username: member.user.username,
+			}));
+			await setCache(message.guildId, members);
+		}
+		catch (err) {
+			members = await getCache(message.guildId);
+			if (!members) {
+				console.log('Couldnt get any membrs', err);
+				return;
+			}
+		}
+
 		const memberIndex = new Map(
 			members.map(m => [
 				m.id,
 				{
 					names: [
 						normalize(m.displayName),
-						normalize(m.user.username),
+						normalize(m.username),
 						m.id,
 					],
 				},
