@@ -16,17 +16,17 @@ module.exports = {
 
 		let members;
 		try {
-			const fetchedMembers = await message.guild.members.fetch();
+			const fetchedMembers = await newMessage.guild.members.fetch();
 
 			members = [...fetchedMembers.values()].map((member) => ({
 				id: member.id,
 				displayName: member.displayName,
 				username: member.user.username,
 			}));
-			await setCache(message.guildId, members);
+			await setCache(newMessage.guildId, members);
 		}
 		catch (err) {
-			members = await getCache(message.guildId);
+			members = await getCache(newMessage.guildId);
 			if (!members) {
 				console.log('Couldnt get any membrs', err);
 				return;
