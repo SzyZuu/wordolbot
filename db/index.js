@@ -16,7 +16,9 @@ const client = createClient({
 });
 
 client.on('error', (err) => console.log('Redis blegh error :C ', err));
-await client.connect();
+client.connect().catch((err) => {
+	console.error('Initial Redis connection failed DDDD: This:', err);
+});
 
 async function shutdown() {
 	await client.quit();
