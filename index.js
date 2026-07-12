@@ -16,6 +16,14 @@ client.once(Events.ClientReady, (readyClient) => {
 	console.log(`Logged in as ${readyClient.user.tag}`);
 });
 
+client.on('error', (err) => {
+	if (err?.name === 'GatewayRateLimitError') {
+		console.warn('Got rate limited');
+		return;
+	}
+	console.error(err);
+});
+
 client.commands = new Collection();
 client.cooldowns = new Collection();
 
