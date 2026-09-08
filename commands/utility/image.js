@@ -5,7 +5,7 @@ module.exports = {
     cooldown: 0,
     data: new SlashCommandBuilder().setName('image').setDescription('debug'),
     async execute(interaction){
-        const img = await createImage();
+        const img = await createImage(interaction.user.displayAvatarURL({extension: 'jpg'}), interaction.member.displayName);
         const attachment = new AttachmentBuilder(img, { name: 'stat-banner.png' })
         interaction.reply({files: [attachment]})
     },
