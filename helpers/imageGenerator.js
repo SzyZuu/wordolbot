@@ -33,10 +33,21 @@ async function createImage(avatarUrl, name){
     ctx.fillStyle = '#C6C6C6';
 
     const statStrings = ['avg guesses:', 'streak:', 'max streak:'];
+    const textYOffsets = [textY + 35, textY + 35 + 25, textY + 35 + 25 * 2];
 
-    ctx.fillText(statStrings[0], textX, textY + 35);
-    ctx.fillText(statStrings[1], textX, textY + 35 + 25);
-    ctx.fillText(statStrings[2], textX, textY + 35 + 25 * 2);
+    for (let i = 0; i < 3; i++){
+        ctx.fillText(statStrings[i], textX, textYOffsets[i]);
+    }
+
+    // VALUES texty shmexty
+    const stringWidths = statStrings.map((item) => ctx.measureText(item).width);
+    const colors = ['#FC84FF', '#FFD161', '#75CCFF'];
+
+    ctx.font = '900 16px "Segoe UI"';
+    for (let i = 0; i < 3; i++){
+        ctx.fillStyle = colors[i];
+        ctx.fillText('0', textX + stringWidths[i] + 5, textYOffsets[i]);
+    }
 
     // avatar
     ctx.beginPath();
