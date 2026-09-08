@@ -5,7 +5,7 @@ async function createImage(avatarUrl, name){
         ctx = canvas.getContext("2d"),
         {width, height} = canvas;
     const avatar = await loadImage(avatarUrl);
-    const avatarSize = 126;
+    const avatarSize = 140;
     const avatarRadius = avatarSize / 2;
     const padding = (height - avatarSize) / 2;
 
@@ -17,23 +17,23 @@ async function createImage(avatarUrl, name){
     const textY = padding + 28;
 
     // NAME texty shmexty fitting shenanigans
-    let nameFontSize = 28;
+    let nameFontSize = 36;
 
     ctx.font = `900 ${nameFontSize}px "Segoe UI"`;
     while (ctx.measureText(name).width > canvas.width - (padding * 2 + avatarSize)){
-        ctx.font = `900 ${nameFontSize -= 10}px "Segoe UI"`;
+        ctx.font = `900 ${nameFontSize -= 5}px "Segoe UI"`;
     }
 
     // NAME texty shmexty
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(name, textX, textY);
+    ctx.fillText(name, textX, textY + 10);
 
     // STATS texty shmexty
     ctx.font = '16px Poppins';
     ctx.fillStyle = '#C6C6C6';
 
     const statStrings = ['avg guesses:', 'streak:', 'max streak:'];
-    const textYOffsets = [textY + 35, textY + 35 + 25, textY + 35 + 25 * 2];
+    const textYOffsets = [textY + 45, textY + 45 + 28, textY + 45 + 28 * 2];
 
     for (let i = 0; i < 3; i++){
         ctx.fillText(statStrings[i], textX, textYOffsets[i]);
@@ -48,6 +48,11 @@ async function createImage(avatarUrl, name){
         ctx.fillStyle = colors[i];
         ctx.fillText('0', textX + stringWidths[i] + 5, textYOffsets[i]);
     }
+
+    // SERVER RANK :waaaaaaaa:
+    ctx.font = '900 36px "Segoe UI"';
+    ctx.fillStyle = '#C6C6C6';
+    ctx.fillText('#1', canvas.width - padding - ctx.measureText('#1').width, canvas.height - padding);
 
     // avatar
     ctx.beginPath();
