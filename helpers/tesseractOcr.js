@@ -28,6 +28,7 @@ module.exports = {
 
 		engine.destroy();
 
-		return text.replace(/\D/g, '');
+		console.log(text);
+		return text.match(/\bwordle\s+no\.?\s*(\d{1,5})\b/i)?.[1];
 	},
 };

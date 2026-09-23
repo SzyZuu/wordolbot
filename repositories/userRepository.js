@@ -84,4 +84,17 @@ async function updateUser(userId, currentWordle) {
 	await db.query(query, [userId, currentWordle]);
 }
 
+async function getCurrentStreak(userId){
+	const query = `
+	WITH x AS (
+	    SELECT
+	        wordle_number
+	    FROM history
+	    WHERE user_id = $1
+	    ORDER BY wordle_number desc
+	)
+	SELECT 
+	`;
+}
+
 module.exports = { initializeUsers, updateTimeBuffer, updateUser };
