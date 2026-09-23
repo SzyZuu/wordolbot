@@ -92,12 +92,14 @@ async function getCurrentStreak(userId){
 				row_number() over (ORDER BY wordle_number desc) AS rn,
 				lag(wordle_number) over (ORDER BY wordle_number desc ) AS prev
 			FROM history
-			WHERE user_id = 515163980965085184
+			WHERE user_id = $1
 		)
 		SELECT min(rn)
 			   FILTER ( WHERE wordle_number <> prev - 1)
 		FROM x;
 	`;
+
+	await db.query(query, [userId]);
 }
 
 module.exports = { initializeUsers, updateTimeBuffer, updateUser };
