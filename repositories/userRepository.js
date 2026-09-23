@@ -94,12 +94,40 @@ async function getCurrentStreak(userId){
 			FROM history
 			WHERE user_id = $1
 		)
-		SELECT min(rn)
-			   FILTER ( WHERE wordle_number <> prev - 1)
-		FROM x;
+		SELECT min(rn) - 1
+		FROM x
+		WHERE wordle_number <> prev - 1;
 	`;
 
 	await db.query(query, [userId]);
+}
+
+async function getLongestStreak(userId){
+	const query = `
+		WITH x AS (
+			SELECT
+				wordle_number,
+				row_number() over (ORDER BY wordle_number desc) AS rn,
+				lag(wordle_number) over (ORDER BY wordle_number desc ) AS prev
+			FROM history
+			WHERE user_id = 515163980965085184
+		),
+			 ax AS (
+				 SELECT rn
+				 FROM x
+				 WHERE wordle_number <> prev - 1
+				 UNION
+				 SELECT max(rn) + 1
+				 FROM x
+			 ),
+			 gaps AS (
+				 SELECT
+					 rn,
+					 lag(rn) OVER (ORDER BY rn desc) AS next_rn
+				 FROM ax
+			 )
+		SELECT max(next_rn - rn) FROM gaps
+	`;
 }
 
 module.exports = { initializeUsers, updateTimeBuffer, updateUser };
