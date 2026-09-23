@@ -86,14 +86,17 @@ async function updateUser(userId, currentWordle) {
 
 async function getCurrentStreak(userId){
 	const query = `
-	WITH x AS (
-	    SELECT
-	        wordle_number
-	    FROM history
-	    WHERE user_id = $1
-	    ORDER BY wordle_number desc
-	)
-	SELECT 
+		WITH x AS (
+			SELECT
+				wordle_number,
+				row_number() over (ORDER BY wordle_number desc) AS rn,
+				lag(wordle_number) over (ORDER BY wordle_number desc ) AS prev
+			FROM history
+			WHERE user_id = 515163980965085184
+		)
+		SELECT min(rn)
+			   FILTER ( WHERE wordle_number <> prev - 1)
+		FROM x;
 	`;
 }
 
