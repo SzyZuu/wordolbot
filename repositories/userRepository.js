@@ -125,7 +125,8 @@ async function getLongestStreak(userId){
 				 FROM x
 				 GROUP BY wordle_number + rn
 			 )
-		SELECT max(length) FROM s_groups AS max_streak;
+		SELECT max(length) AS max_streak
+		FROM s_groups;
 	`;
 
 	const result = await db.query(query, [userId]);
