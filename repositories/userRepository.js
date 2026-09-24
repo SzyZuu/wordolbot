@@ -84,4 +84,64 @@ async function updateUser(userId, currentWordle) {
 	await db.query(query, [userId, currentWordle]);
 }
 
-module.exports = { initializeUsers, updateTimeBuffer, updateUser };
+async function getCurrentStreak(userId){
+	const query = `
+		WITH x AS (
+			SELECT
+				wordle_number,
+				row_number() over (ORDER BY wordle_number desc) AS rn
+			FROM history
+			WHERE user_id = $1
+		), s_groups AS (
+		    SELECT
+		        wordle_number + rn AS s_group,
+		        count(*) AS length
+		    FROM x
+		    GROUP BY wordle_number + rn
+		)
+		SELECT length AS current_streak
+		FROM s_groups
+		ORDER BY s_group desc
+		LIMIT 1
+	`;
+
+	const result = await db.query(query, [userId]);
+	return result.rows[0].current_streak;
+}
+
+async function getLongestStreak(userId){
+	const query = `
+		WITH x AS (
+			SELECT
+				wordle_number,
+				row_number() over (ORDER BY wordle_number desc) AS rn
+			FROM history
+			WHERE user_id = $1
+		),
+			 s_groups AS (
+				 SELECT
+					 wordle_number + rn AS s_group,
+					 count(*) AS length
+				 FROM x
+				 GROUP BY wordle_number + rn
+			 )
+		SELECT max(length) AS max_streak
+		FROM s_groups;
+	`;
+
+	const result = await db.query(query, [userId]);
+	return result.rows[0].max_streak;
+}
+
+async function getAvgGuesses(userId){
+	const query = `
+	SELECT ROUND(AVG(guesses), 1) AS avg_guesses
+	FROM history
+	WHERE user_id = $1
+	`;
+
+	const result = await db.query(query, [userId]);
+	return result.rows[0].avg_guesses;
+}
+
+module.exports = { initializeUsers, updateTimeBuffer, updateUser, getCurrentStreak, getLongestStreak, getAvgGuesses };
