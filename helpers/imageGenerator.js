@@ -1,6 +1,7 @@
 const { Canvas, loadImage, FontLibrary} = require('skia-canvas')
+const { getAvgGuesses, getCurrentStreak, getLongestStreak } = require('../repositories/userRepository')
 
-async function createImage(avatarUrl, name){
+async function createImage(avatarUrl, name, userId){
     let canvas = new Canvas(500, 200),
         ctx = canvas.getContext("2d"),
         {width, height} = canvas;
@@ -44,10 +45,17 @@ async function createImage(avatarUrl, name){
     const colors = ['#FC84FF', '#FFD161', '#75CCFF'];
 
     ctx.font = '900 16px "Segoe UI"';
-    for (let i = 0; i < 3; i++){
+
+    const userValues = await Promise.all([
+        getAvgGuesses(userId),
+        getCurrentStreak(userId),
+        getLongestStreak(userId)
+    ]);
+
+    userValues.forEach((value, i) => {
         ctx.fillStyle = colors[i];
-        ctx.fillText('0', textX + stringWidths[i] + 5, textYOffsets[i]);
-    }
+        ctx.fillText(value.toString(), textX + stringWidths[i] + 5, textYOffsets[i]);
+    })
 
     // SERVER RANK :waaaaaaaa:
     ctx.font = '900 36px "Segoe UI"';
