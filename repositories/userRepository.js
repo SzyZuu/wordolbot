@@ -99,13 +99,14 @@ async function getCurrentStreak(userId){
 		    FROM x
 		    GROUP BY wordle_number + rn
 		)
-		SELECT length
+		SELECT length AS current_streak
 		FROM s_groups
 		ORDER BY s_group desc
 		LIMIT 1
 	`;
 
-	await db.query(query, [userId]);
+	const result = await db.query(query, [userId]);
+	return result.rows[0].current_streak;
 }
 
 async function getLongestStreak(userId){
@@ -124,10 +125,22 @@ async function getLongestStreak(userId){
 				 FROM x
 				 GROUP BY wordle_number + rn
 			 )
-		SELECT max(length) FROM s_groups;
+		SELECT max(length) FROM s_groups AS max_streak;
 	`;
 
-	await db.query(query, [userId]);
+	const result = await db.query(query, [userId]);
+	return result.rows[0].max_streak;
 }
 
-module.exports = { initializeUsers, updateTimeBuffer, updateUser, getCurrentStreak, getLongestStreak };
+async function getAvgGuesses(userId){
+	const query = `
+	SELECT ROUND(AVG(guesses), 1) AS avg_guesses
+	FROM history
+	WHERE user_id = $1
+	`;
+
+	const result = await db.query(query, [userId]);
+	return result.rows[0].avg_guesses;
+}
+
+module.exports = { initializeUsers, updateTimeBuffer, updateUser, getCurrentStreak, getLongestStreak, getAvgGuesses };
