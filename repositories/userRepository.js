@@ -89,14 +89,20 @@ async function getCurrentStreak(userId){
 		WITH x AS (
 			SELECT
 				wordle_number,
-				row_number() over (ORDER BY wordle_number desc) AS rn,
-				lag(wordle_number) over (ORDER BY wordle_number desc ) AS prev
+				row_number() over (ORDER BY wordle_number desc) AS rn
 			FROM history
 			WHERE user_id = $1
+		), s_groups AS (
+		    SELECT
+		        wordle_number + rn AS s_group,
+		        count(*) AS length
+		    FROM x
+		    GROUP BY wordle_number + rn
 		)
-		SELECT min(rn) - 1
-		FROM x
-		WHERE wordle_number <> prev - 1;
+		SELECT length
+		FROM s_groups
+		ORDER BY s_group desc
+		LIMIT 1
 	`;
 
 	await db.query(query, [userId]);
@@ -107,27 +113,21 @@ async function getLongestStreak(userId){
 		WITH x AS (
 			SELECT
 				wordle_number,
-				row_number() over (ORDER BY wordle_number desc) AS rn,
-				lag(wordle_number) over (ORDER BY wordle_number desc ) AS prev
+				row_number() over (ORDER BY wordle_number desc) AS rn
 			FROM history
-			WHERE user_id = 515163980965085184
+			WHERE user_id = $1
 		),
-			 ax AS (
-				 SELECT rn
-				 FROM x
-				 WHERE wordle_number <> prev - 1
-				 UNION
-				 SELECT max(rn) + 1
-				 FROM x
-			 ),
-			 gaps AS (
+			 s_groups AS (
 				 SELECT
-					 rn,
-					 lag(rn) OVER (ORDER BY rn desc) AS next_rn
-				 FROM ax
+					 wordle_number + rn AS s_group,
+					 count(*) AS length
+				 FROM x
+				 GROUP BY wordle_number + rn
 			 )
-		SELECT max(next_rn - rn) FROM gaps
+		SELECT max(length) FROM s_groups;
 	`;
+
+	await db.query(query, [userId]);
 }
 
-module.exports = { initializeUsers, updateTimeBuffer, updateUser };
+module.exports = { initializeUsers, updateTimeBuffer, updateUser, getCurrentStreak, getLongestStreak };
