@@ -1,5 +1,4 @@
 const db = require('../db');
-const {max} = require("pg/lib/defaults");
 
 async function initializeUsers(userIds, names, streaks, guesses, totalGames, gameNr, serverID) {
 	const client = await db.getClient();
