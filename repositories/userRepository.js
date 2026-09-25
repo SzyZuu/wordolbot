@@ -107,8 +107,7 @@ async function getCurrentStreak(userId){
 	`;
 
 	const result = await db.query(query, [userId]);
-	const currentStreak = result.rows[0].current_streak;
-	return currentStreak ? currentStreak : 0;
+	return result.rows[0]?.current_streak ?? 0;
 }
 
 async function getLongestStreak(userId){
@@ -132,8 +131,7 @@ async function getLongestStreak(userId){
 	`;
 
 	const result = await db.query(query, [userId]);
-	const maxStreak = result.rows[0].max_streak;
-	return maxStreak ? maxStreak : 0;
+	return result.rows[0]?.max_streak ?? 0;
 }
 
 async function getAvgGuesses(userId){
@@ -144,8 +142,7 @@ async function getAvgGuesses(userId){
 	`;
 
 	const result = await db.query(query, [userId]);
-	const avgGuesses = result.rows[0].avg_guesses
-	return avgGuesses ? avgGuesses : 0;
+	return result.rows[0]?.avg_guesses ?? 0;
 }
 
 module.exports = { initializeUsers, updateTimeBuffer, updateUser, getCurrentStreak, getLongestStreak, getAvgGuesses };
